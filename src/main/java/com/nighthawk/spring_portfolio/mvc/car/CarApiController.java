@@ -30,9 +30,8 @@ public class CarApiController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Car> createCar(@RequestBody Car car) {
-        Car savedCar = carRepository.save(car);
-        return new ResponseEntity<>(savedCar, HttpStatus.CREATED);
+    public {
+        
     }
 
     @PutMapping("/{id}")
@@ -45,16 +44,6 @@ public class CarApiController {
 
                     Car savedCar = carRepository.save(existingCar);
                     return new ResponseEntity<>(savedCar, HttpStatus.OK);
-                })
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCar(@PathVariable Long id) {
-        return carRepository.findById(id)
-                .map(car -> {
-                    carRepository.deleteById(id);
-                    return new ResponseEntity<>("Car has been deleted", HttpStatus.OK);
                 })
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
