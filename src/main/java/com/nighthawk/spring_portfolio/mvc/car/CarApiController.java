@@ -29,9 +29,24 @@ public class CarApiController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping("/")
-    public {
-        
+    @PostMapping("/post")
+    public ResponseEntity<Car> postCar(@PathVariable int length) {
+        if (length <= 0) {
+            // Handle invalid input
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // Call the existing utility method to generate a random array
+        int[] randomArray = CarSortingAlgorithm.generateRandomArray(length);
+
+        // Create a Car object with the generated array
+        Car car = new Car(randomArray);
+
+        // You can perform additional logic here if needed
+
+        // Return the Car object in the response
+        return new ResponseEntity<>(car, HttpStatus.OK);
+    }
     }
 
     @PutMapping("/{id}")

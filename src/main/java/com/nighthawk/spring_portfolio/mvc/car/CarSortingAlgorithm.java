@@ -8,7 +8,7 @@ public class CarSortingAlgorithm {
     protected int comparisons;
     protected int mergesOrSwaps;
 
-    // Timing logic for sorting algorithms
+    // Sorting Algorithm times
     public void timeSortingAlgorithm(int[] arr, String algorithmName) {
         iterations = 0;
         comparisons = 0;
@@ -32,15 +32,15 @@ public class CarSortingAlgorithm {
 
     // Method to be implemented by subclasses
     protected void sort(int[] arr) {
-        // To be overridden by specific sorting algorithm
+        // The other classes will override this method
     }
 
-    // Generate a random array of integers
+    // Generate a random array of integers based on user input
     protected int[] generateRandomArray(int length) {
         Random random = new Random();
         int[] arr = new int[length];
         for (int i = 0; i < length; i++) {
-            arr[i] = random.nextInt(100); // Adjust the bound as needed
+            arr[i] = random.nextInt(10000);
         }
         return arr;
     }
@@ -175,26 +175,5 @@ class BubbleSort extends CarSortingAlgorithm {
                 comparisons++;
             }
         }
-    }
-}
-
-class Main {
-    public static void main(String[] args) {
-        CarSortingAlgorithm sortingAlgorithm = new CarSortingAlgorithm();
-
-        int length = 10; // Adjust the length as needed
-        int[] arr = sortingAlgorithm.generateRandomArray(length);
-
-        InsertionSort insertionSort = new InsertionSort();
-        insertionSort.timeSortingAlgorithm(Arrays.copyOf(arr, arr.length), "Insertion Sort");
-
-        MergeSort mergeSort = new MergeSort();
-        mergeSort.timeSortingAlgorithm(Arrays.copyOf(arr, arr.length), "Merge Sort");
-
-        SelectionSort selectionSort = new SelectionSort();
-        selectionSort.timeSortingAlgorithm(Arrays.copyOf(arr, arr.length), "Selection Sort");
-
-        BubbleSort bubbleSort = new BubbleSort();
-        bubbleSort.timeSortingAlgorithm(Arrays.copyOf(arr, arr.length), "Bubble Sort");
     }
 }
