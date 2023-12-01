@@ -17,7 +17,7 @@ public class CarApiController {
     @GetMapping("/speeds")
     public Map<String, Integer> getAlgorithmSpeeds(@RequestParam(required = false) Integer arraySize) {
         // Use a fixed array size for testing if not provided by the user
-        int size = (arraySize != null && arraySize > 0) ? arraySize : 1000;
+        int size = (arraySize != null && arraySize > 0) ? arraySize : 10000;
 
 
         // generate random array based on the specified size
