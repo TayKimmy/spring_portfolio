@@ -137,30 +137,13 @@
                 { algorithm: 'bubbleSort', speed: speeds.bubbleSort },
                 { algorithm: 'selectionSort', speed: speeds.selectionSort },
             ];
-    
-            // sort the algorithms based on their speeds
-            sortAlgorithms.sort((a, b) => a.speed - b.speed);
-    
-            // position the race cars on the track and update algorithm labels
-            sortAlgorithms.forEach((algorithm, index) => {
-                const carSelector = `.race-car${index + 1}`;
-                document.querySelector(carSelector).style.transform = `translateX(${index * 25}%)`;
-                document.getElementById(`carLabel${index + 1}`).innerHTML = algorithm.algorithm;
-            });
-    
-            // calculate the total time for the race
-            const totalTime = sortAlgorithms[sortAlgorithms.length - 1].speed;
-    
-            // display race results after the race duration
-            setTimeout(() => {
-                displayRaceResults(sortAlgorithms);
-            }, totalTime * 100);
-    
+            
+
             // move race cars to the finish line with timing based on their speeds
             sortAlgorithms.forEach((algorithm, index) => {
                 const carSelector = `.race-car${index + 1}`;
                 setTimeout(() => {
-                    document.querySelector(carSelector).style.transform = `translateX(550%)`;
+                    document.querySelector(carSelector).style.transform = `translateX(850%)`;
                 }, 100 * (1 / algorithm.speed));
             });
         }
