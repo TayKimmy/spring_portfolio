@@ -1,8 +1,9 @@
-package com.nighthawk.spring_portfolio.mvc.car;
+package com.nighthawk.spring_portfolio.mvc.betting;
 
 public class Betting {
 
     private int points;
+    private String resultMessage;
 
     public Betting(int startingPoints) { // method for the actual Betting with parameter being the number of points the user begins with
         this.points = startingPoints;
@@ -15,15 +16,23 @@ public class Betting {
             return;
         }
 
-        if (isGuessCorrect) { // if the user guesses correctly, they can earn double the points that they bet
-            points += betAmount * 2; 
-            System.out.println("Correct guess! You won " + (betAmount * 2) + " points.");
+        if (isGuessCorrect) {
+            points += betAmount*2;
+            resultMessage = "Correct guess! You won " + (betAmount * 2) + " points. Current points: " + points;
+    
         } else {
-            points -= betAmount; // if the user guesses correctly, the user loses the number of points that they bet
-            System.out.println("Wrong guess! You lost " + betAmount + " points.");
+            points -= betAmount;
+            resultMessage = "Wrong guess! You lost " + betAmount + " points. Current points: " + points;
+
         }
 
         System.out.println("Current points: " + points);
+
+        
+    }
+
+    public String getResultMessage(){
+        return resultMessage;
     }
 
     public static void main(String[] args) {

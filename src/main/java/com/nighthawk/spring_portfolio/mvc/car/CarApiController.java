@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nighthawk.spring_portfolio.mvc.betting.Betting;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +59,8 @@ public class CarApiController {
         
         return algorithmSpeeds;
     }
+
+    
 
     private int[] generateRandomArray(int size) {
         int[] randomArray = new int[size];
@@ -113,4 +117,37 @@ public class CarApiController {
             arr[i] = temp;
         }
     }
+
+// ... existing CarApiController class code ...
+
+// Add a new endpoint for placing bets on sorting algorithms
+@GetMapping("/bet")
+public String betOnSortRace(@RequestParam(required = true) String algorithm, 
+                            @RequestParam(required = true) int betAmount, 
+                            @RequestParam(required = true) int startingPoints) {
+
+    // Initialize betting game
+    Betting game = new Betting(startingPoints);
+
+    // Run the sorting algorithms and get speeds
+    Map<String, Integer> speeds = getAlgorithmSpeeds(null);
+
+    // Determine the fastest algorithm
+    String fastestAlgorithm = speeds.entrySet().stream()
+                                     .min(Map.Entry.comparingByValue())
+                                     .map(Map.Entry::getKey)
+                                     .orElse("none");
+
+    // Check if the user's guess matches the fastest algorithm
+    boolean isGuessCorrect = algorithm.equals(fastestAlgorithm);
+
+    // Place the bet and get the result
+    game.placeBet(betAmount, isGuessCorrect);
+
+    // Return a response indicating the outcome
+    return game.getResultMessage();
+}
+
+
+
 }

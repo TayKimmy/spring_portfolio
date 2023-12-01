@@ -92,6 +92,21 @@
             width: 50px;
             margin-bottom: 10px;
         }
+
+        #bettingSection {
+            text-align: center; /* Center the betting section */
+            margin: 20px 0; /* Add some margin for spacing */
+        }
+
+        #betAmount {
+            width: 100px; /* Set a width for the input box */
+        }
+
+        #betMessage {
+            color: yellow; /* Make the message stand out */
+            margin-top: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -120,8 +135,20 @@
         </div>
     </div>
 
+    <div id="userPointsDisplay" class="text">User Points: 500</div> <!-- example starting points -->
+
+    <div id="bettingSection">
+        <input type="number" id="betAmount" placeholder="Enter bet amount" min="1">
+        <button id="placeBetButton" onclick="placeBet()">Place Bet</button>
+        <div id="betMessage"></div>
+    </div>
+
+
+
     <button id="startButton" onclick="startFibonacciRace()">Start Fibonacci Race</button>
     <button id="resetButton" onclick="resetRace()">Reset Race</button>
+
+
 
     <script>
         // asynchronous function to start the Fibonacci race
@@ -156,6 +183,31 @@
             document.querySelector('.race-car3').style.transform = `translateX(0)`;
             document.querySelector('.race-car4').style.transform = `translateX(0)`;
         }
+
+        function placeBet() {
+            const betAmount = parseInt(document.getElementById('betAmount').value);
+            const userPoints = parseInt(document.getElementById('userPointsDisplay').textContent.split(': ')[1]);
+
+            // Validate the bet amount
+            if (isNaN(betAmount) || betAmount <= 0) {
+                document.getElementById('betMessage').textContent = 'Error: Please enter a positive number.';
+                return;
+            }
+
+            if (betAmount > userPoints) {
+                document.getElementById('betMessage').textContent = 'Error: Bet amount exceeds available points.';
+                return;
+            }
+
+            fetch(`http://localhost:8085/api/sort/bet?algorithm=YOUR_CHOSEN_ALGORITHM&betAmount=${betAmount}&startingPoints=${userPoints}`)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('betMessage').textContent = data;
+                    // Update user points based on the response
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        
     </script>
     
     
