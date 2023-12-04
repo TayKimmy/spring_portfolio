@@ -22,14 +22,19 @@
             margin-bottom: 20px;
         }
 
-        .race-car1, .race-car2, .race-car3, .race-car4 {
-            position: absolute;
-            top: 20px;
+        /* Common styles for all race cars */
+        .race-car {
             width: 175px;
             height: 70px;
             margin: auto;
             transition: transform 4s linear;
         }
+
+        /* Specific styles for each race car */
+        .race-car1 { top: 20px; }
+        .race-car2 { top: 25%; }
+        .race-car3 { top: 50%; }
+        .race-car4 { top: 75%; }
 
         .lane, .lane1 {
             height: 25%;
@@ -69,7 +74,7 @@
 
         .car-label {
             position: absolute;
-            top: 30%; /* adjust the positioning as needed */
+            top: 30%;
             left: -50px;
             text-align: center;
             width: 50px;
@@ -78,35 +83,6 @@
             writing-mode: vertical-rl;
             text-orientation: mixed;
         }
-
-        #speedForm {
-            margin-top: 20px;
-        }
-
-        #speedForm label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        #speedForm input {
-            width: 50px;
-            margin-bottom: 10px;
-        }
-
-        #bettingSection {
-            text-align: center; /* Center the betting section */
-            margin: 20px 0; /* Add some margin for spacing */
-        }
-
-        #betAmount {
-            width: 100px; /* Set a width for the input box */
-        }
-
-        #betMessage {
-            color: yellow; /* Make the message stand out */
-            margin-top: 10px;
-        }
-
     </style>
 </head>
 <body>
@@ -116,100 +92,27 @@
     <div id="track">
         <div class="lane">
             <span class="car-label" id="carLabel1">Merge Sort</span>
-            <img class="race-car1" src="https://github.com/TEE-CSA/TEEBackend/assets/109186517/0fe7001f-0d2e-40fc-bdd1-9b82373862f5" alt="Car 1">
+            <img class="race-car race-car1" src="https://github.com/TEE-CSA/TEEBackend/assets/109186517/0fe7001f-0d2e-40fc-bdd1-9b82373862f5" alt="Car 1">
         </div>
         <div class="lane" style="top: 25%;">
             <span class="car-label" id="carLabel2">Insertion Sort</span>
-            <img class="race-car2" src="https://github.com/TEE-CSA/TEEBackend/assets/109186517/6d9bc8e3-8c8e-4854-8194-0b5fdacad24b" alt="Car 2">
+            <img class="race-car race-car2" src="https://github.com/TEE-CSA/TEEBackend/assets/109186517/6d9bc8e3-8c8e-4854-8194-0b5fdacad24b" alt="Car 2">
         </div>
         <div class="lane" style="top: 50%;">
             <span class="car-label" id="carLabel3">Bubble Sort</span>
-            <img class="race-car3" src="https://github.com/TEE-CSA/TEEBackend/assets/109186517/3976c85c-ae57-43a0-9331-1e10bf51d29f" alt="Car 3">
+            <img class="race-car race-car3" src="https://github.com/TEE-CSA/TEEBackend/assets/109186517/3976c85c-ae57-43a0-9331-1e10bf51d29f" alt="Car 3">
         </div>
         <div class="lane1" style="top: 75%">
             <span class="car-label" id="carLabel4">Selection Sort</span>
-            <img class="race-car4" src="https://github.com/TEE-CSA/TEEBackend/assets/109186517/7ad3a783-5957-4979-81c0-33619a9b4ef4" alt="Car 4">
+            <img class="race-car race-car4" src="https://github.com/TEE-CSA/TEEBackend/assets/109186517/7ad3a783-5957-4979-81c0-33619a9b4ef4" alt="Car 4">
         </div>
         <div class="finish">
             <span class="finish-text">Finish</span>
         </div>
     </div>
 
-    <div id="userPointsDisplay" class="text">User Points: 500</div> <!-- example starting points -->
-
-    <div id="bettingSection">
-        <input type="number" id="betAmount" placeholder="Enter bet amount" min="1">
-        <button id="placeBetButton" onclick="placeBet()">Place Bet</button>
-        <div id="betMessage"></div>
-    </div>
-
-
-
-    <button id="startButton" onclick="startFibonacciRace()">Start Fibonacci Race</button>
-    <button id="resetButton" onclick="resetRace()">Reset Race</button>
-
-
-
     <script>
-        // asynchronous function to start the Fibonacci race
-        async function startFibonacciRace() {
-            // fetch sort speeds from the provided API endpoint
-            const response = await fetch('http://localhost:8085/api/sort/speeds');
-            const speeds = await response.json();
-    
-            // create an array of sort algorithms with their corresponding speeds
-            const sortAlgorithms = [
-                { algorithm: 'mergeSort', speed: speeds.mergeSort },
-                { algorithm: 'insertionSort', speed: speeds.insertionSort },
-                { algorithm: 'bubbleSort', speed: speeds.bubbleSort },
-                { algorithm: 'selectionSort', speed: speeds.selectionSort },
-            ];
-            
 
-            // move race cars to the finish line with timing based on their speeds
-            sortAlgorithms.forEach((algorithm, index) => {
-                const carSelector = `.race-car${index + 1}`;
-                setTimeout(() => {
-                    document.querySelector(carSelector).style.transform = `translateX(850%)`;
-                }, 100 * (1 / algorithm.speed));
-            });
-        }
-    
-        // reset race 
-        function resetRace() {
-          
-            document.querySelector('.race-car1').style.transform = `translateX(0)`;
-            document.querySelector('.race-car2').style.transform = `translateX(0)`;
-            document.querySelector('.race-car3').style.transform = `translateX(0)`;
-            document.querySelector('.race-car4').style.transform = `translateX(0)`;
-        }
-
-        function placeBet() {
-            const betAmount = parseInt(document.getElementById('betAmount').value);
-            const userPoints = parseInt(document.getElementById('userPointsDisplay').textContent.split(': ')[1]);
-
-            // Validate the bet amount
-            if (isNaN(betAmount) || betAmount <= 0) {
-                document.getElementById('betMessage').textContent = 'Error: Please enter a positive number.';
-                return;
-            }
-
-            if (betAmount > userPoints) {
-                document.getElementById('betMessage').textContent = 'Error: Bet amount exceeds available points.';
-                return;
-            }
-
-            fetch(`http://localhost:8085/api/sort/bet?algorithm=YOUR_CHOSEN_ALGORITHM&betAmount=${betAmount}&startingPoints=${userPoints}`)
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('betMessage').textContent = data;
-                    // Update user points based on the response
-                })
-                .catch(error => console.error('Error:', error));
-        }
-        
     </script>
-    
-    
 </body>
 </html>
