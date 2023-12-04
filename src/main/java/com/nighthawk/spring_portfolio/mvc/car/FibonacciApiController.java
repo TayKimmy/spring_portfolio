@@ -12,88 +12,105 @@ import java.util.Map;
 @RequestMapping("/api/fibonacci")
 public class FibonacciApiController {
 
-    @GetMapping("/speeds")
-    public Map<String, Integer> getAlgorithmSpeeds(@RequestParam(required = false) Integer length) {
-        // Use a fixed array size for testing if not provided by the user
-        int size = (length != null && length > 0) ? length : 100;
-
-        // 
-        int forLoopTime = (int) measureTime(() -> fibonacciForLoop(size));
-        int whileLoopTime = (int) measureTime(() -> fibonacciWhileLoop(size));
-        int recursionTime = (int) measureTime(() -> fibonacciRecursion(size));
-        int matrixTime = (int) measureTime(() -> fibonacciMatrix(size));
-        
-
-        // algorithm speeds
-        Map<String, Integer> algorithmSpeeds = new HashMap<>();
-        algorithmSpeeds.put("forLoop", forLoopTime);
-        algorithmSpeeds.put("whileLoop", whileLoopTime);
-        algorithmSpeeds.put("recursion", recursionTime);
-        algorithmSpeeds.put("matrix", matrixTime);
-        
-        return algorithmSpeeds;
+    abstract static class FibonacciAlgorithm {
+        abstract long calculateFibonacci(int length);
     }
 
-    // method to determine times for each algorithm
-    private long measureTime(Runnable task) {
+    static class ForLoopFibonacci extends FibonacciAlgorithm {
+        @Override
+        long calculateFibonacci(int length) {
+            long a = 0, b = 1;
+            for (int i = 2; i < length; i++) {
+                long temp = a + b;
+                a = b;
+                b = temp;
+            }
+            return a;
+        }
+    }
+
+    static class WhileLoopFibonacci extends FibonacciAlgorithm {
+        @Override
+        long calculateFibonacci(int length) {
+            long a = 0, b = 1;
+            int i = 2;
+            while (i < length) {
+                long temp = a + b;
+                a = b;
+                b = temp;
+                i++;
+            }
+            return a;
+        }
+    }
+
+    static class RecursionFibonacci extends FibonacciAlgorithm {
+        @Override
+        long calculateFibonacci(int length) {
+            return finishRecursion(length);
+        }
+
+        private long finishRecursion(int n) {
+            if (n <= 1) {
+                return n;
+            }
+            return finishRecursion(n - 1) + finishRecursion(n - 2);
+        }
+    }
+
+    static class MatrixFibonacci extends FibonacciAlgorithm {
+        @Override
+        long calculateFibonacci(int length) {
+            return matrixRecursive(length);
+        }
+
+        private long matrixRecursive(int n) {
+            if (n == 0) {
+                return 0;
+            }
+            long a = 0, b = 1, temp;
+            for (int i = 2; i <= n; i++) {
+                temp = a + b;
+                a = b;
+                b = temp;
+            }
+            return a;
+        }
+    }
+
+    @GetMapping("/calculate")
+    public Map<String, Object> calculateFibonacci(
+            @RequestParam(required = false) Integer length,
+            @RequestParam(required = true) String algorithm) {
+        int size = (length != null && length > 0) ? length : 10;
+
+        FibonacciAlgorithm fibonacciAlgorithm = createFibonacciAlgorithm(algorithm);
+
+        Map<String, Object> response = measureFibonacciTime(fibonacciAlgorithm, size);
+        response.put("result", fibonacciAlgorithm.calculateFibonacci(size));
+
+        return response;
+    }
+
+    private FibonacciAlgorithm createFibonacciAlgorithm(String algorithm) {
+        Map<String, FibonacciAlgorithm> algorithmMap = new HashMap<>();
+        algorithmMap.put("forloop", new ForLoopFibonacci());
+        algorithmMap.put("whileloop", new WhileLoopFibonacci());
+        algorithmMap.put("recursion", new RecursionFibonacci());
+        algorithmMap.put("matrix", new MatrixFibonacci());
+
+        return algorithmMap.get(algorithm.toLowerCase());
+    }
+
+    private Map<String, Object> measureFibonacciTime(FibonacciAlgorithm algorithm, int size) {
         long startTime = System.currentTimeMillis();
-        task.run();
+        long result = algorithm.calculateFibonacci(size);
         long endTime = System.currentTimeMillis();
-        return endTime - startTime;
-    }
 
-    // Fibonacci using for loop
-    private void fibonacciForLoop(int length) {
-        long a = 0, b = 1;
-        for (int i = 2; i < length; i++) {
-            long temp = a + b;
-            a = b;
-            b = temp;
-        }
-    }
+        Map<String, Object> response = new HashMap<>();
+        response.put("result", result);
+        response.put("time", endTime - startTime);
 
-    // Fibonacci using while loop
-    private void fibonacciWhileLoop(int length) {
-        long a = 0, b = 1;
-        int i = 2;
-        while (i < length) {
-            long temp = a + b;
-            a = b;
-            b = temp;
-            i++;
-        }
-    }
-
-    // Fibonacci using recursion
-    private void fibonacciRecursion(int length) {
-        for (int i = 0; i < length; i++) {
-            finishRecursion(i);
-        }
-    }
-
-    private long finishRecursion(int n) {
-        if (n <= 1) {
-            return n;
-        }
-        return finishRecursion(n - 1) + finishRecursion(n - 2);
-    }
-
-    // Fibonacci using matrices
-    private void fibonacciMatrix(int length) {
-        for (int i = 0; i < length; i++) {
-            matrixRecursive(i);
-        }
-    }
-
-    private void matrixRecursive(int n) {
-        if (n == 0) {
-            return;
-        }
-        long a = 0, b = 1, temp;
-        for (int i = 2; i <= n; i++) {
-            temp = a + b;
-            a = b;
-            b = temp;
-        }
+        return response;
     }
 }
