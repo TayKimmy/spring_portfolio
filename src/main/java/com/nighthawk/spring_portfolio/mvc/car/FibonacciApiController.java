@@ -13,25 +13,24 @@ import java.util.Map;
 public class FibonacciApiController {
 
     abstract static class FibonacciAlgorithm {
-        abstract long calculateFibonacci(int length);
+        abstract void fibonacci(int length);
     }
 
     static class ForLoopFibonacci extends FibonacciAlgorithm {
         @Override
-        long calculateFibonacci(int length) {
+        void fibonacci(int length) {
             long a = 0, b = 1;
             for (int i = 2; i < length; i++) {
                 long temp = a + b;
                 a = b;
                 b = temp;
             }
-            return a;
         }
     }
 
     static class WhileLoopFibonacci extends FibonacciAlgorithm {
         @Override
-        long calculateFibonacci(int length) {
+        void fibonacci(int length) {
             long a = 0, b = 1;
             int i = 2;
             while (i < length) {
@@ -40,14 +39,13 @@ public class FibonacciApiController {
                 b = temp;
                 i++;
             }
-            return a;
         }
     }
 
     static class RecursionFibonacci extends FibonacciAlgorithm {
         @Override
-        long calculateFibonacci(int length) {
-            return finishRecursion(length);
+        void fibonacci(int length) {
+            finishRecursion(length);
         }
 
         private long finishRecursion(int n) {
@@ -60,8 +58,8 @@ public class FibonacciApiController {
 
     static class MatrixFibonacci extends FibonacciAlgorithm {
         @Override
-        long calculateFibonacci(int length) {
-            return matrixRecursive(length);
+        void fibonacci(int length) {
+            matrixRecursive(length);
         }
 
         private long matrixRecursive(int n) {
@@ -78,39 +76,28 @@ public class FibonacciApiController {
         }
     }
 
-    @GetMapping("/calculate")
-    public Map<String, Object> calculateFibonacci(
-            @RequestParam(required = false) Integer length,
-            @RequestParam(required = true) String algorithm) {
-        int size = (length != null && length > 0) ? length : 10;
+    @GetMapping("/speeds")
+    public Map<String, Integer> getAlgorithmSpeeds(@RequestParam(required = false) Integer length) {
+        int size = (length != null && length > 0) ? length : 30000;
 
-        FibonacciAlgorithm fibonacciAlgorithm = createFibonacciAlgorithm(algorithm);
+        Map<String, Integer> algorithmSpeeds = new HashMap<>();
 
-        Map<String, Object> response = measureFibonacciTime(fibonacciAlgorithm, size);
-        response.put("result", fibonacciAlgorithm.calculateFibonacci(size));
+        algorithmSpeeds.put("forLoopFibonacci", measureFibonacciTime(new ForLoopFibonacci(), size));
+        algorithmSpeeds.put("whileLoopFibonacci", measureFibonacciTime(new WhileLoopFibonacci(), size));
+        algorithmSpeeds.put("recursionFibonacci", measureFibonacciTime(new RecursionFibonacci(), size));
+        algorithmSpeeds.put("MatrixFibonacci", measureFibonacciTime(new MatrixFibonacci(), size));
 
-        return response;
+        return algorithmSpeeds;
     }
 
-    private FibonacciAlgorithm createFibonacciAlgorithm(String algorithm) {
-        Map<String, FibonacciAlgorithm> algorithmMap = new HashMap<>();
-        algorithmMap.put("forloop", new ForLoopFibonacci());
-        algorithmMap.put("whileloop", new WhileLoopFibonacci());
-        algorithmMap.put("recursion", new RecursionFibonacci());
-        algorithmMap.put("matrix", new MatrixFibonacci());
-
-        return algorithmMap.get(algorithm.toLowerCase());
+    private void runFibonacciAlgorithm(FibonacciAlgorithm algorithm, int size) {
+        algorithm.fibonacci(size);
     }
 
-    private Map<String, Object> measureFibonacciTime(FibonacciAlgorithm algorithm, int size) {
+    private int measureFibonacciTime(FibonacciAlgorithm algorithm, int size) {
         long startTime = System.currentTimeMillis();
-        long result = algorithm.calculateFibonacci(size);
+        runFibonacciAlgorithm(algorithm, size);
         long endTime = System.currentTimeMillis();
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("result", result);
-        response.put("time", endTime - startTime);
-
-        return response;
+        return (int) (endTime - startTime);
     }
 }
