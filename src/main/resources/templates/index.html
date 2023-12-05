@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -31,12 +32,24 @@
         }
 
         /* Specific styles for each race car */
-        .race-car1 { top: 20px; }
-        .race-car2 { top: 25%; }
-        .race-car3 { top: 50%; }
-        .race-car4 { top: 75%; }
+        .race-car1 {
+            top: 20px;
+        }
 
-        .lane, .lane1 {
+        .race-car2 {
+            top: 25%;
+        }
+
+        .race-car3 {
+            top: 50%;
+        }
+
+        .race-car4 {
+            top: 75%;
+        }
+
+        .lane,
+        .lane1 {
             height: 25%;
             width: 100%;
             position: absolute;
@@ -83,8 +96,18 @@
             writing-mode: vertical-rl;
             text-orientation: mixed;
         }
+
+        #startBtn,
+        #resetBtn {
+            display: block;
+            margin: 10px;
+            padding: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
+
 <body>
     <h1 class="text">User Score: 0</h1>
     <h1 class="text">Amount Bet: 0</h1>
@@ -111,8 +134,47 @@
         </div>
     </div>
 
-    <script>
+    <button id="startBtn" onclick="startRace()">Start Race</button>
+    <button id="resetBtn" onclick="resetRace()">Reset Race</button>
 
+    <script>
+        async function startRace() {
+            try {
+                // Fetch algorithm times from the backend
+                const response = await fetch('http://localhost:8085/api/sort/speeds');
+                const algorithmTimes = await response.json();
+
+                // Calculate the duration for each algorithm
+                const duration = 4000; // 4 seconds for animation
+                const car1Duration = (algorithmTimes["mergeSort"] / 1000) * duration;
+                const car2Duration = (algorithmTimes["insertionSort"] / 1000) * duration;
+                const car3Duration = (algorithmTimes["bubbleSort"] / 1000) * duration;
+                const car4Duration = (algorithmTimes["selectionSort"] / 1000) * duration;
+
+                // Set the animation duration for each car
+                document.querySelector(".race-car1").style.transitionDuration = car1Duration + "ms";
+                document.querySelector(".race-car2").style.transitionDuration = car2Duration + "ms";
+                document.querySelector(".race-car3").style.transitionDuration = car3Duration + "ms";
+                document.querySelector(".race-car4").style.transitionDuration = car4Duration + "ms";
+
+                // Start the race by applying the transform property
+                document.querySelector(".race-car1").style.transform = "translateX(800%)";
+                document.querySelector(".race-car2").style.transform = "translateX(800%)";
+                document.querySelector(".race-car3").style.transform = "translateX(800%)";
+                document.querySelector(".race-car4").style.transform = "translateX(800%)";
+            } catch (error) {
+                console.error('Error fetching algorithm times:', error);
+            }
+        }
+
+        function resetRace() {
+            // Reset the race by setting the transform property back to the initial position
+            document.querySelector(".race-car1").style.transform = "translateX(0)";
+            document.querySelector(".race-car2").style.transform = "translateX(0)";
+            document.querySelector(".race-car3").style.transform = "translateX(0)";
+            document.querySelector(".race-car4").style.transform = "translateX(0)";
+        }
     </script>
 </body>
+
 </html>
