@@ -16,51 +16,88 @@ import java.util.Random;
 @RequestMapping("/api/sort")
 public class CarApiController {
 
-    @GetMapping("/speeds")
-    public Map<String, Integer> getAlgorithmSpeeds(@RequestParam(required = false) Integer arraySize) {
-        // Use a fixed array size for testing if not provided by the user
-        int size = (arraySize != null && arraySize > 0) ? arraySize : 50000;
-
-
-        // generate random array based on the specified size
-        int[] randomArray = generateRandomArray(size);
-
-        // measure sorting speeds for different algorithms
-        long mergeSortStartTime = System.currentTimeMillis();
-        // merge sort on the random array
-        mergeSort(randomArray.clone());
-        long mergeSortEndTime = System.currentTimeMillis();
-        int mergeSortSpeed = (int) (mergeSortEndTime - mergeSortStartTime);
-
-        long insertionSortStartTime = System.currentTimeMillis();
-        // insertion sort on the random array
-        insertionSort(randomArray.clone());
-        long insertionSortEndTime = System.currentTimeMillis();
-        int insertionSortSpeed = (int) (insertionSortEndTime - insertionSortStartTime);
-
-        long bubbleSortStartTime = System.currentTimeMillis();
-        // bubble sort on the random array
-        bubbleSort(randomArray.clone());
-        long bubbleSortEndTime = System.currentTimeMillis();
-        int bubbleSortSpeed = (int) (bubbleSortEndTime - bubbleSortStartTime);
-
-        long selectionSortStartTime = System.currentTimeMillis();
-        // selection sort on the random array
-        selectionSort(randomArray.clone());
-        long selectionSortEndTime = System.currentTimeMillis();
-        int selectionSortSpeed = (int) (selectionSortEndTime - selectionSortStartTime);
-
-        // algorithm speeds
-        Map<String, Integer> algorithmSpeeds = new HashMap<>();
-        algorithmSpeeds.put("mergeSort", mergeSortSpeed);
-        algorithmSpeeds.put("insertionSort", insertionSortSpeed);
-        algorithmSpeeds.put("bubbleSort", bubbleSortSpeed);
-        algorithmSpeeds.put("selectionSort", selectionSortSpeed);
-        
-        return algorithmSpeeds;
+    // Sorting algorithms base class
+    abstract static class SortingAlgorithm {
+        abstract void sort(int[] arr);
     }
 
-    
+    // Merge sort
+    static class MergeSort extends SortingAlgorithm {
+        @Override
+        void sort(int[] arr) {
+            Arrays.sort(arr);
+        }
+    }
+
+    // Insertion sort
+    static class InsertionSort extends SortingAlgorithm {
+        @Override
+        void sort(int[] arr) {
+            int n = arr.length;
+            for (int i = 1; i < n; ++i) {
+                int key = arr[i];
+                int j = i - 1;
+
+                while (j >= 0 && arr[j] > key) {
+                    arr[j + 1] = arr[j];
+                    j = j - 1;
+                }
+                arr[j + 1] = key;
+            }
+        }
+    }
+
+    // Bubble sort
+    static class BubbleSort extends SortingAlgorithm {
+        @Override
+        void sort(int[] arr) {
+            int n = arr.length;
+            for (int i = 0; i < n - 1; i++) {
+                for (int j = 0; j < n - i - 1; j++) {
+                    if (arr[j] > arr[j + 1]) {
+                        int temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                    }
+                }
+            }
+        }
+    }
+
+    // Selection sort
+    static class SelectionSort extends SortingAlgorithm {
+        @Override
+        void sort(int[] arr) {
+            int n = arr.length;
+            for (int i = 0; i < n - 1; i++) {
+                int minIdx = i;
+                for (int j = i + 1; j < n; j++) {
+                    if (arr[j] < arr[minIdx]) {
+                        minIdx = j;
+                    }
+                }
+                int temp = arr[minIdx];
+                arr[minIdx] = arr[i];
+                arr[i] = temp;
+            }
+        }
+    }
+
+    @GetMapping("/speeds")
+    public Map<String, Integer> getAlgorithmSpeeds(@RequestParam(required = false) Integer arraySize) {
+        int size = (arraySize != null && arraySize > 0) ? arraySize : 30000;
+
+        int[] randomArray = generateRandomArray(size);
+
+        Map<String, Integer> algorithmSpeeds = new HashMap<>();
+
+        algorithmSpeeds.put("mergeSort", measureSortingSpeed(new MergeSort(), randomArray.clone()));
+        algorithmSpeeds.put("insertionSort", measureSortingSpeed(new InsertionSort(), randomArray.clone()));
+        algorithmSpeeds.put("bubbleSort", measureSortingSpeed(new BubbleSort(), randomArray.clone()));
+        algorithmSpeeds.put("selectionSort", measureSortingSpeed(new SelectionSort(), randomArray.clone()));
+
+        return algorithmSpeeds;
+    }
 
     private int[] generateRandomArray(int size) {
         int[] randomArray = new int[size];
@@ -71,83 +108,35 @@ public class CarApiController {
         return randomArray;
     }
 
-    // sorting algorithms
-    private void mergeSort(int[] arr) {
-        Arrays.sort(arr);
+    private void runSortingAlgorithm(SortingAlgorithm algorithm, int[] arr) {
+        algorithm.sort(arr);
     }
 
-    private void insertionSort(int[] arr) {
-        int n = arr.length;
-        for (int i = 1; i < n; ++i) {
-            int key = arr[i];
-            int j = i - 1;
-
-            while (j >= 0 && arr[j] > key) {
-                arr[j + 1] = arr[j];
-                j = j - 1;
-            }
-            arr[j + 1] = key;
-        }
-    }
-    
-    private void bubbleSort(int[] arr) {
-        int n = arr.length;
-        for (int i = 0; i < n-1; i++) {
-            for (int j = 0; j < n-i-1; j++) {
-                if (arr[j] > arr[j+1]) {
-                    int temp = arr[j];
-                    arr[j] = arr[j+1];
-                    arr[j+1] = temp;
-                }
-            }
-        }
+    private int measureSortingSpeed(SortingAlgorithm algorithm, int[] arr) {
+        long startTime = System.currentTimeMillis();
+        runSortingAlgorithm(algorithm, arr);
+        long endTime = System.currentTimeMillis();
+        return (int) (endTime - startTime);
     }
 
-    private void selectionSort(int[] arr) {
-        int n = arr.length;
-        for (int i = 0; i < n-1; i++) {
-            int minIdx = i;
-            for (int j = i+1; j < n; j++) {
-                if (arr[j] < arr[minIdx]) {
-                    minIdx = j;
-                }
-            }
-            int temp = arr[minIdx];
-            arr[minIdx] = arr[i];
-            arr[i] = temp;
-        }
+    @GetMapping("/bet")
+    public String betOnSortRace(@RequestParam(required = true) String algorithm,
+                                @RequestParam(required = true) int betAmount,
+                                @RequestParam(required = true) int startingPoints) {
+
+        Betting game = new Betting(startingPoints);
+
+        Map<String, Integer> speeds = getAlgorithmSpeeds(null);
+
+        String fastestAlgorithm = speeds.entrySet().stream()
+                .min(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("none");
+
+        boolean isGuessCorrect = algorithm.equals(fastestAlgorithm);
+
+        game.placeBet(betAmount, isGuessCorrect);
+
+        return game.getResultMessage();
     }
-
-// ... existing CarApiController class code ...
-
-// Add a new endpoint for placing bets on sorting algorithms
-@GetMapping("/bet")
-public String betOnSortRace(@RequestParam(required = true) String algorithm, 
-                            @RequestParam(required = true) int betAmount, 
-                            @RequestParam(required = true) int startingPoints) {
-
-    // Initialize betting game
-    Betting game = new Betting(startingPoints);
-
-    // Run the sorting algorithms and get speeds
-    Map<String, Integer> speeds = getAlgorithmSpeeds(null);
-
-    // Determine the fastest algorithm
-    String fastestAlgorithm = speeds.entrySet().stream()
-                                     .min(Map.Entry.comparingByValue())
-                                     .map(Map.Entry::getKey)
-                                     .orElse("none");
-
-    // Check if the user's guess matches the fastest algorithm
-    boolean isGuessCorrect = algorithm.equals(fastestAlgorithm);
-
-    // Place the bet and get the result
-    game.placeBet(betAmount, isGuessCorrect);
-
-    // Return a response indicating the outcome
-    return game.getResultMessage();
-}
-
-
-
 }
