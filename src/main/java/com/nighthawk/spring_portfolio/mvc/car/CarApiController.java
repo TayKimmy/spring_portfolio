@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nighthawk.spring_portfolio.mvc.betting.Betting;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -119,24 +121,32 @@ public class CarApiController {
         return (int) (endTime - startTime);
     }
 
-    @GetMapping("/bet")
-    public String betOnSortRace(@RequestParam(required = true) String algorithm,
-                                @RequestParam(required = true) int betAmount,
-                                @RequestParam(required = true) int startingPoints) {
+@GetMapping("/bet")
 
-        Betting game = new Betting(startingPoints);
+public Map<String, Object> betOnSortRace(@RequestParam(required = true) int betAmount,
+                                         @RequestParam(required = true) int startingPoints) {
+    Betting game = new Betting(startingPoints);
 
-        Map<String, Integer> speeds = getAlgorithmSpeeds(null);
+    Map<String, Integer> speeds = getAlgorithmSpeeds(null);
 
-        String fastestAlgorithm = speeds.entrySet().stream()
-                .min(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse("none");
+    // Randomly select an algorithm
+    List<String> algorithms = new ArrayList<>(speeds.keySet());
+    String selectedAlgorithm = algorithms.get(new Random().nextInt(algorithms.size()));
 
-        boolean isGuessCorrect = algorithm.equals(fastestAlgorithm);
+    String fastestAlgorithm = speeds.entrySet().stream()
+            .min(Map.Entry.comparingByValue())
+            .map(Map.Entry::getKey)
+            .orElse("none");
 
-        game.placeBet(betAmount, isGuessCorrect);
+    boolean isGuessCorrect = selectedAlgorithm.equals(fastestAlgorithm);
 
-        return game.getResultMessage();
-    }
+    game.placeBet(betAmount, isGuessCorrect);
+
+    Map<String, Object> result = new HashMap<>();
+    result.put("message", game.getResultMessage());
+    result.put("newScore", game.getPoints());
+    result.put("selectedAlgorithm", selectedAlgorithm); // Include the selected algorithm in the response
+    return result;
+}
+
 }
