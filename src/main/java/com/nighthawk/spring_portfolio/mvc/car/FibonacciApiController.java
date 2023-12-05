@@ -98,9 +98,9 @@ public class FibonacciApiController {
     }
 
     private int measureFibonacciTime(FibonacciAlgorithm algorithm, int size) {
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
         runFibonacciAlgorithm(algorithm, size);
-        long endTime = System.currentTimeMillis();
+        long endTime = System.nanoTime();
         return (int) (endTime - startTime);
     }
 }
