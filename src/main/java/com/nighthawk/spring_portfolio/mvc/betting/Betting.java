@@ -35,6 +35,10 @@ public class Betting {
         return resultMessage;
     }
 
+    public int getPoints() {
+        return points;
+    }
+
     public static void main(String[] args) {
         Betting game = new Betting(500); // example call where user starts with 500 points
 
