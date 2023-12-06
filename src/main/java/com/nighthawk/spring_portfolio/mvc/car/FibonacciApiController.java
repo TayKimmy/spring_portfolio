@@ -1,9 +1,5 @@
 package com.nighthawk.spring_portfolio.mvc.car;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -22,11 +18,11 @@ public class FibonacciApiController {
     static class ForLoopFibonacci extends FibonacciAlgorithm {
         @Override
         void fibonacci(int length) {
-            long a = 0, b = 1;
-            for (int i = 2; i < length; i++) {
-                long temp = a + b;
+            long a = 0, b = 1, c, i;
+            for (i = 2; i < length; i++) {
+                c = a + b;
                 a = b;
-                b = temp;
+                b = c;
             }
         }
     }
@@ -81,7 +77,7 @@ public class FibonacciApiController {
 
     @GetMapping("/speeds")
     public Map<String, Integer> getAlgorithmSpeeds(@RequestParam(required = false) Integer length) {
-        int size = (length != null && length > 0) ? length : 30000;
+        int size = (length != null && length > 0) ? length : 40;
 
         Map<String, Integer> algorithmSpeeds = new HashMap<>();
 
@@ -101,6 +97,6 @@ public class FibonacciApiController {
         long startTime = System.nanoTime();
         runFibonacciAlgorithm(algorithm, size);
         long endTime = System.nanoTime();
-        return (int) (endTime - startTime);
-    }
+        return (int) ((endTime - startTime) / 1_000_000);  // Convert nanoseconds to milliseconds
+}
 }
