@@ -85,7 +85,7 @@ public class CarApiController {
 
     @GetMapping("/speeds")
     public Map<String, Integer> getAlgorithmSpeeds(@RequestParam(required = false) Integer arraySize) {
-        int size = (arraySize != null && arraySize > 0) ? arraySize : 30000;
+        int size = (arraySize != null && arraySize > 0) ? arraySize : 40000;
 
         int[] randomArray = generateRandomArray(size);
 
