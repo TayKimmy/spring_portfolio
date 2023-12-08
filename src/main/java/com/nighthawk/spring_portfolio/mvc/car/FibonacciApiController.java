@@ -84,7 +84,7 @@ public class FibonacciApiController {
         algorithmSpeeds.put("forLoopFibonacci", measureFibonacciTime(new ForLoopFibonacci(), size));
         algorithmSpeeds.put("whileLoopFibonacci", measureFibonacciTime(new WhileLoopFibonacci(), size));
         algorithmSpeeds.put("recursionFibonacci", measureFibonacciTime(new RecursionFibonacci(), size));
-        algorithmSpeeds.put("MatrixFibonacci", measureFibonacciTime(new MatrixFibonacci(), size));
+        algorithmSpeeds.put("matrixFibonacci", measureFibonacciTime(new MatrixFibonacci(), size));
 
         return algorithmSpeeds;
     }
