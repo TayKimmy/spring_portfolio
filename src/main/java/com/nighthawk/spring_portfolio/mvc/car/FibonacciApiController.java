@@ -2,7 +2,6 @@ package com.nighthawk.spring_portfolio.mvc.car;
 
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,10 +53,18 @@ public class FibonacciApiController {
         }
 
         private long finishRecursion(int n) {
-            if (n <= 1) {
-                return n;
-            }
-            return finishRecursion(n - 1) + finishRecursion(n - 2);
+            int f[]= new int[n + 2];
+            int i;
+ 
+            f[0] = 0;
+            f[1] = 1;
+ 
+            for (i = 2; i <= n; i++) {
+            
+            f[i] = f[i - 1] + f[i - 2];
+        }
+ 
+        return f[n];
         }
     }
 
@@ -87,17 +94,20 @@ public class FibonacciApiController {
 
         Map<String, Integer> algorithmSpeeds = new HashMap<>();
 
-        int recursionTime;
-        if(size > 20) {
-            recursionTime = new RecursionFibonacci().measureFibonacciTime(size) / 10000;
-        }
-        else {
-            recursionTime = new RecursionFibonacci().measureFibonacciTime(size) * 2;
-        }
+        //int recursionTime;
+        //if(size > 25) {
+        //    recursionTime = new RecursionFibonacci().measureFibonacciTime(size) / 10000;
+        //}
+        //else if (15 < size && size < 25) {
+        //    recursionTime = new RecursionFibonacci().measureFibonacciTime(size);
+        //}
+        //else {
+        //    recursionTime = new RecursionFibonacci().measureFibonacciTime(size)*2;
+        //}
 
         algorithmSpeeds.put("forLoopFibonacci", new ForLoopFibonacci().measureFibonacciTime(size));
         algorithmSpeeds.put("whileLoopFibonacci", new WhileLoopFibonacci().measureFibonacciTime(size));
-        algorithmSpeeds.put("recursionFibonacci", recursionTime);
+        algorithmSpeeds.put("recursionFibonacci", new RecursionFibonacci().measureFibonacciTime(size));
         algorithmSpeeds.put("matrixFibonacci", new MatrixFibonacci().measureFibonacciTime(size));
 
         return algorithmSpeeds;
