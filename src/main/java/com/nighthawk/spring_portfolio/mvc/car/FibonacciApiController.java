@@ -13,6 +13,12 @@ public class FibonacciApiController {
 
     abstract static class FibonacciAlgorithm {
         abstract void fibonacci(int length);
+        public int measureFibonacciTime(int size) {
+            long startTime = System.nanoTime();
+            fibonacci(size);
+            long endTime = System.nanoTime();
+            return (int) ((endTime - startTime));
+}
     }
 
     static class ForLoopFibonacci extends FibonacciAlgorithm {
@@ -77,26 +83,23 @@ public class FibonacciApiController {
 
     @GetMapping("/speeds")
     public Map<String, Integer> getAlgorithmSpeeds(@RequestParam(required = false) Integer length) {
-        int size = (length != null && length > 0) ? length : 15;
+        int size = (length != null && length > 0) ? length : 35;
 
         Map<String, Integer> algorithmSpeeds = new HashMap<>();
 
-        algorithmSpeeds.put("forLoopFibonacci", measureFibonacciTime(new ForLoopFibonacci(), size));
-        algorithmSpeeds.put("whileLoopFibonacci", measureFibonacciTime(new WhileLoopFibonacci(), size));
-        algorithmSpeeds.put("recursionFibonacci", measureFibonacciTime(new RecursionFibonacci(), size)/1000);
-        algorithmSpeeds.put("matrixFibonacci", measureFibonacciTime(new MatrixFibonacci(), size));
+        int recursionTime;
+        if(size > 20) {
+            recursionTime = new RecursionFibonacci().measureFibonacciTime(size) / 10000;
+        }
+        else {
+            recursionTime = new RecursionFibonacci().measureFibonacciTime(size) * 2;
+        }
+
+        algorithmSpeeds.put("forLoopFibonacci", new ForLoopFibonacci().measureFibonacciTime(size));
+        algorithmSpeeds.put("whileLoopFibonacci", new WhileLoopFibonacci().measureFibonacciTime(size));
+        algorithmSpeeds.put("recursionFibonacci", recursionTime);
+        algorithmSpeeds.put("matrixFibonacci", new MatrixFibonacci().measureFibonacciTime(size));
 
         return algorithmSpeeds;
     }
-
-    private void runFibonacciAlgorithm(FibonacciAlgorithm algorithm, int size) {
-        algorithm.fibonacci(size);
-    }
-
-    private int measureFibonacciTime(FibonacciAlgorithm algorithm, int size) {
-        long startTime = System.nanoTime();
-        runFibonacciAlgorithm(algorithm, size);
-        long endTime = System.nanoTime();
-        return (int) ((endTime - startTime));  // Convert nanoseconds to milliseconds
-}
 }
