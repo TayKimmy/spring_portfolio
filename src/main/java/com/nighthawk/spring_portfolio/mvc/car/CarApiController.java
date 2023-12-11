@@ -21,7 +21,7 @@ import java.util.Random;
 public class CarApiController {
 
     // sorting algorithms superclass
-    abstract static class SortingAlgorithm {
+    abstract class SortingAlgorithm {
         abstract void sort(int[] arr);
 
         int measureSortingSpeed(int[] arr) {
@@ -33,7 +33,7 @@ public class CarApiController {
     }
 
     // merge sort
-    static class MergeSort extends SortingAlgorithm {
+    class MergeSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
             Arrays.sort(arr);
@@ -41,7 +41,7 @@ public class CarApiController {
     }
 
     // insertion sort
-    static class InsertionSort extends SortingAlgorithm {
+    class InsertionSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
             int n = arr.length;
@@ -59,7 +59,7 @@ public class CarApiController {
     }
 
     // bubble sort
-    static class BubbleSort extends SortingAlgorithm {
+    class BubbleSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
             int n = arr.length;
@@ -76,7 +76,7 @@ public class CarApiController {
     }
 
     // selection sort
-    static class SelectionSort extends SortingAlgorithm {
+    class SelectionSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
             int n = arr.length;
@@ -118,14 +118,6 @@ public class CarApiController {
         }
         return randomArray;
     }
-
-    // private void runSortingAlgorithm(SortingAlgorithm algorithm, int[] arr) {
-    //     algorithm.sort(arr);
-    // }
-
-    // private int measureSortingSpeed(SortingAlgorithm algorithm, int[] arr) {
-    //     return algorithm.measureSortingSpeed(arr);
-    // }
 
     @GetMapping("/bet")
     public Map<String, Object> betOnSortRace(@RequestParam(required = true) int betAmount,
