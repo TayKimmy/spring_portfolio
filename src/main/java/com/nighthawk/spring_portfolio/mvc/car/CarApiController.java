@@ -148,7 +148,21 @@ public Map<String, Object> betOnSortRace(@RequestParam(required = true) int betA
     result.put("message", game.getResultMessage());
     result.put("newScore", game.getPoints());
     result.put("selectedAlgorithm", selectedAlgorithm); // selected algorithm in the response
+
+    Map<String, String> algorithmFacts = getAlgorithmFacts();
+    result.put("funFact", algorithmFacts.get(fastestAlgorithm)); // Add fun fact
+    result.put("didUserWin", isGuessCorrect); // Add win/loss information
+
     return result;
+}
+
+private Map<String, String> getAlgorithmFacts() {
+    Map<String, String> facts = new HashMap<>();
+    facts.put("mergeSort", "Merge Sort is an efficient, stable, comparison-based, divide and conquer sorting algorithm. Most implementations produce a stable sort, meaning that the implementation preserves the input order of equal elements in the sorted output.");
+    facts.put("insertionSort", "Insertion Sort is a simple sorting algorithm that builds the final sorted array one item at a time. It is much less efficient on large lists than more advanced algorithms such as quicksort, heapsort, or merge sort.");
+    facts.put("bubbleSort", "Bubble Sort is a simple sorting algorithm that repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order. The pass through the list is repeated until the list is sorted.");
+    facts.put("selectionSort", "Selection Sort is an in-place comparison sorting algorithm. It has an O(n^2) complexity, which makes it inefficient on large lists, and generally performs worse than the similar insertion sort.");
+    return facts;
 }
 
 }
