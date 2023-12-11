@@ -20,13 +20,20 @@ import java.util.Random;
 @RequestMapping("/api/sort")
 public class CarApiController {
 
-    // sorting algorithms base class
-    abstract static class SortingAlgorithm {
+    // sorting algorithms superclass
+    abstract class SortingAlgorithm {
         abstract void sort(int[] arr);
+
+        int measureSortingSpeed(int[] arr) {
+            long startTime = System.currentTimeMillis();
+            sort(arr);
+            long endTime = System.currentTimeMillis();
+            return (int) (endTime - startTime);
+        }
     }
 
-    // mrge sort
-    static class MergeSort extends SortingAlgorithm {
+    // merge sort
+    class MergeSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
             Arrays.sort(arr);
@@ -34,7 +41,7 @@ public class CarApiController {
     }
 
     // insertion sort
-    static class InsertionSort extends SortingAlgorithm {
+    class InsertionSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
             int n = arr.length;
@@ -52,7 +59,7 @@ public class CarApiController {
     }
 
     // bubble sort
-    static class BubbleSort extends SortingAlgorithm {
+    class BubbleSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
             int n = arr.length;
@@ -69,7 +76,7 @@ public class CarApiController {
     }
 
     // selection sort
-    static class SelectionSort extends SortingAlgorithm {
+    class SelectionSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
             int n = arr.length;
@@ -95,10 +102,10 @@ public class CarApiController {
 
         Map<String, Integer> algorithmSpeeds = new HashMap<>();
 
-        algorithmSpeeds.put("mergeSort", measureSortingSpeed(new MergeSort(), randomArray.clone()));
-        algorithmSpeeds.put("insertionSort", measureSortingSpeed(new InsertionSort(), randomArray.clone()));
-        algorithmSpeeds.put("bubbleSort", measureSortingSpeed(new BubbleSort(), randomArray.clone()));
-        algorithmSpeeds.put("selectionSort", measureSortingSpeed(new SelectionSort(), randomArray.clone()));
+        algorithmSpeeds.put("mergeSort", new MergeSort().measureSortingSpeed(randomArray.clone()));
+        algorithmSpeeds.put("insertionSort", new InsertionSort().measureSortingSpeed(randomArray.clone()));
+        algorithmSpeeds.put("bubbleSort", new BubbleSort().measureSortingSpeed(randomArray.clone()));
+        algorithmSpeeds.put("selectionSort", new SelectionSort().measureSortingSpeed(randomArray.clone()));
 
         return algorithmSpeeds;
     }
@@ -112,9 +119,33 @@ public class CarApiController {
         return randomArray;
     }
 
-    private void runSortingAlgorithm(SortingAlgorithm algorithm, int[] arr) {
-        algorithm.sort(arr);
+    @GetMapping("/bet")
+    public Map<String, Object> betOnSortRace(@RequestParam(required = true) int betAmount,
+                                            @RequestParam(required = true) int startingPoints) {
+        Betting game = new Betting(startingPoints);
+
+        Map<String, Integer> speeds = getAlgorithmSpeeds(null);
+
+        // randomly select an algorithm
+        List<String> algorithms = new ArrayList<>(speeds.keySet());
+        String selectedAlgorithm = algorithms.get(new Random().nextInt(algorithms.size()));
+
+        String fastestAlgorithm = speeds.entrySet().stream()
+                .min(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("none");
+
+        boolean isGuessCorrect = selectedAlgorithm.equals(fastestAlgorithm);
+
+        game.placeBet(betAmount, isGuessCorrect);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("message", game.getResultMessage());
+        result.put("newScore", game.getPoints());
+        result.put("selectedAlgorithm", selectedAlgorithm); // selected algorithm in the response
+        return result;
     }
+<<<<<<< HEAD
 
     private int measureSortingSpeed(SortingAlgorithm algorithm, int[] arr) {
         long startTime = System.currentTimeMillis();
@@ -166,3 +197,6 @@ private Map<String, String> getAlgorithmFacts() {
 }
 
 }
+=======
+}
+>>>>>>> 58b9051a4958d84c8112e91c33c7888d11974875
