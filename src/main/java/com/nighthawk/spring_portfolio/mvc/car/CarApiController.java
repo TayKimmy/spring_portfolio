@@ -1,5 +1,6 @@
 package com.nighthawk.spring_portfolio.mvc.car;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,16 +15,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/sort")
 public class CarApiController {
 
-    // Sorting algorithms base class
+    // sorting algorithms base class
     abstract static class SortingAlgorithm {
         abstract void sort(int[] arr);
     }
 
-    // Merge sort
+    // mrge sort
     static class MergeSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
@@ -31,7 +33,7 @@ public class CarApiController {
         }
     }
 
-    // Insertion sort
+    // insertion sort
     static class InsertionSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
@@ -49,7 +51,7 @@ public class CarApiController {
         }
     }
 
-    // Bubble sort
+    // bubble sort
     static class BubbleSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
@@ -66,7 +68,7 @@ public class CarApiController {
         }
     }
 
-    // Selection sort
+    // selection sort
     static class SelectionSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
@@ -129,7 +131,7 @@ public Map<String, Object> betOnSortRace(@RequestParam(required = true) int betA
 
     Map<String, Integer> speeds = getAlgorithmSpeeds(null);
 
-    // Randomly select an algorithm
+    // randomly select an algorithm
     List<String> algorithms = new ArrayList<>(speeds.keySet());
     String selectedAlgorithm = algorithms.get(new Random().nextInt(algorithms.size()));
 
@@ -145,7 +147,7 @@ public Map<String, Object> betOnSortRace(@RequestParam(required = true) int betA
     Map<String, Object> result = new HashMap<>();
     result.put("message", game.getResultMessage());
     result.put("newScore", game.getPoints());
-    result.put("selectedAlgorithm", selectedAlgorithm); // Include the selected algorithm in the response
+    result.put("selectedAlgorithm", selectedAlgorithm); // selected algorithm in the response
     return result;
 }
 
