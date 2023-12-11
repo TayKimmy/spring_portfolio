@@ -18,9 +18,9 @@ public class FibonacciApiController {
     abstract public class FibonacciAlgorithm {
         abstract void fibonacci(int length);
         public int measureFibonacciTime(int size) {
-            long startTime = System.nanoTime();
+            long startTime = System.currentTimeMillis();
             fibonacci(size);
-            long endTime = System.nanoTime();
+            long endTime = System.currentTimeMillis();
             return (int) ((endTime - startTime));
         }
     }
