@@ -10,7 +10,7 @@ import java.util.Map;
 @RequestMapping("/api/fibonacci")
 public class FibonacciApiController {
 
-    abstract static class FibonacciAlgorithm {
+    abstract public class FibonacciAlgorithm {
         abstract void fibonacci(int length);
         public int measureFibonacciTime(int size) {
             long startTime = System.nanoTime();
@@ -20,7 +20,7 @@ public class FibonacciApiController {
         }
     }
 
-    static class ForLoopFibonacci extends FibonacciAlgorithm {
+    public class ForLoopFibonacci extends FibonacciAlgorithm {
         @Override
         void fibonacci(int length) {
             int a = 0, b = 1;
@@ -32,7 +32,7 @@ public class FibonacciApiController {
         }
     }
 
-    static class WhileLoopFibonacci extends FibonacciAlgorithm {
+    public class WhileLoopFibonacci extends FibonacciAlgorithm {
         @Override
         void fibonacci(int length) {
             int a = 0, b = 1;
@@ -46,7 +46,7 @@ public class FibonacciApiController {
         }
     }
 
-    static class RecursionFibonacci extends FibonacciAlgorithm {
+    public class RecursionFibonacci extends FibonacciAlgorithm {
         @Override
         void fibonacci(int length) {
             finishRecursion(length);
@@ -68,7 +68,7 @@ public class FibonacciApiController {
         }
     }
 
-    static class MatrixFibonacci extends FibonacciAlgorithm {
+    public class MatrixFibonacci extends FibonacciAlgorithm {
         @Override
         void fibonacci(int length) {
             matrixRecursive(length);
