@@ -44,7 +44,7 @@
             top: 50%;
         }
 
-        .race-car4 {
+        .race-car4 {    
             top: 75%;
         }
 
@@ -146,6 +146,11 @@
 
     <script>
 
+    let userScoreSort = 500; // Initial user score for sorting race
+    let betAmountSort = 0;   // Initial bet amount for sorting race
+    let userScoreFib = 500;  // Initial user score for Fibonacci race
+    let betAmountFib = 0;    
+
         
 
     
@@ -186,6 +191,45 @@
             
         }
 
+        async function startFibonacciRace(){
+
+            try {
+            // Fetch Fibonacci algorithm times from the backend
+            const response = await fetch('http://localhost:8085/api/fibonacci/speeds');
+            const algorithmTimes = await response.json();
+
+            // Calculate the duration for each algorithm
+            const duration = 4000; // 4 seconds for animation
+            const car1Duration = (algorithmTimes["forLoopFibonacci"] / 1000) * duration;
+            const car2Duration = (algorithmTimes["whileLoopFibonacci"] / 1000) * duration;
+            const car3Duration = (algorithmTimes["recursionFibonacci"] / 1000) * duration;
+            const car4Duration = (algorithmTimes["matrixFibonacci"] / 1000) * duration;
+
+            // Set the animation duration for each car
+            document.querySelector(".race-car1").style.transitionDuration = car1Duration + "ms";
+            document.querySelector(".race-car2").style.transitionDuration = car2Duration + "ms";
+            document.querySelector(".race-car3").style.transitionDuration = car3Duration + "ms";
+            document.querySelector(".race-car4").style.transitionDuration = car4Duration + "ms";
+
+            // Start the race by applying the transform property
+            document.querySelector(".race-car1").style.transform = "translateX(800%)";
+            document.querySelector(".race-car2").style.transform = "translateX(800%)";
+            document.querySelector(".race-car3").style.transform = "translateX(800%)";
+            document.querySelector(".race-car4").style.transform = "translateX(800%)";
+
+            setTimeout(() => {
+                alert(`Race finished! You bet on: ${selectedAlgorithm}. ${result.didUserWin ? 'You won!' : 'You lost.'} Fun Fact: ${result.funFact}`);
+                document.getElementById("userScore").textContent = result.newScore;
+            }, Math.max(car1Duration, car2Duration, car3Duration, car4Duration));
+
+        } catch (error) {
+            console.error('Error fetching Fibonacci algorithm times:', error);
+        }
+    }
+
+
+
+
         function resetRace() {
             // Reset the race by setting the transform property back to the initial position
             document.querySelector(".race-car1").style.transform = "translateX(0)";
@@ -212,6 +256,29 @@
         console.error('Error placing bet:', error);
     }
 }
+
+
+async function placeBetFib() {
+        const fibBetInput = parseInt(document.getElementById("fibBetInput").value);
+        if (isNaN(fibBetInput) || fibBetInput <= 0) {
+            alert("Invalid bet amount for Fibonacci race");
+            return;
+        }
+
+        betAmountFib = fibBetInput;
+        document.getElementById("betAmountFib").textContent = betAmountFib;
+
+        try {
+            // Fetch bet results for Fibonacci race
+            const response = await fetch(`http://localhost:8085/api/fibonacci/bet?betAmount=${betAmountFib}&startingPoints=${userScoreFib}`);
+            const fibResult = await response.json();
+
+            // Start the Fibonacci race with the result
+            startFibonacciRace(fibResult.selectedAlgorithm, fibResult);
+        } catch (error) {
+            console.error('Error placing bet for Fibonacci race:', error);
+        }
+    }
 
     </script>
 </body>
