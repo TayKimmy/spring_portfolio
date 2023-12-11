@@ -119,41 +119,6 @@ public class CarApiController {
         return randomArray;
     }
 
-    @GetMapping("/bet")
-    public Map<String, Object> betOnSortRace(@RequestParam(required = true) int betAmount,
-                                            @RequestParam(required = true) int startingPoints) {
-        Betting game = new Betting(startingPoints);
-
-        Map<String, Integer> speeds = getAlgorithmSpeeds(null);
-
-        // randomly select an algorithm
-        List<String> algorithms = new ArrayList<>(speeds.keySet());
-        String selectedAlgorithm = algorithms.get(new Random().nextInt(algorithms.size()));
-
-        String fastestAlgorithm = speeds.entrySet().stream()
-                .min(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse("none");
-
-        boolean isGuessCorrect = selectedAlgorithm.equals(fastestAlgorithm);
-
-        game.placeBet(betAmount, isGuessCorrect);
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("message", game.getResultMessage());
-        result.put("newScore", game.getPoints());
-        result.put("selectedAlgorithm", selectedAlgorithm); // selected algorithm in the response
-        return result;
-    }
-<<<<<<< HEAD
-
-    private int measureSortingSpeed(SortingAlgorithm algorithm, int[] arr) {
-        long startTime = System.currentTimeMillis();
-        runSortingAlgorithm(algorithm, arr);
-        long endTime = System.currentTimeMillis();
-        return (int) (endTime - startTime);
-    }
-
 @GetMapping("/bet")
 
 public Map<String, Object> betOnSortRace(@RequestParam(required = true) int betAmount,
@@ -197,6 +162,3 @@ private Map<String, String> getAlgorithmFacts() {
 }
 
 }
-=======
-}
->>>>>>> 58b9051a4958d84c8112e91c33c7888d11974875
