@@ -17,7 +17,7 @@ public class FibonacciApiController {
             fibonacci(size);
             long endTime = System.nanoTime();
             return (int) ((endTime - startTime));
-}
+        }
     }
 
     static class ForLoopFibonacci extends FibonacciAlgorithm {
@@ -93,17 +93,6 @@ public class FibonacciApiController {
         int size = (length != null && length > 0) ? length : 35;
 
         Map<String, Integer> algorithmSpeeds = new HashMap<>();
-
-        //int recursionTime;
-        //if(size > 25) {
-        //    recursionTime = new RecursionFibonacci().measureFibonacciTime(size) / 10000;
-        //}
-        //else if (15 < size && size < 25) {
-        //    recursionTime = new RecursionFibonacci().measureFibonacciTime(size);
-        //}
-        //else {
-        //    recursionTime = new RecursionFibonacci().measureFibonacciTime(size)*2;
-        //}
 
         algorithmSpeeds.put("forLoopFibonacci", new ForLoopFibonacci().measureFibonacciTime(size));
         algorithmSpeeds.put("whileLoopFibonacci", new WhileLoopFibonacci().measureFibonacciTime(size));
