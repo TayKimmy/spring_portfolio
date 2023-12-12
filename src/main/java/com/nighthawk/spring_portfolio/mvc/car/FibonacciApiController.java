@@ -16,6 +16,8 @@ import java.util.Random;
 public class FibonacciApiController {
 
     abstract public class FibonacciAlgorithm {
+        protected int comparisons;
+        protected int iterations;
         abstract void fibonacci(int length);
         public int measureFibonacciTime(int size) {
             long startTime = System.nanoTime();
@@ -23,13 +25,18 @@ public class FibonacciApiController {
             long endTime = System.nanoTime();
             return (int) ((endTime - startTime));
         }
+        public int getIterations() {
+            return iterations;
+        }
     }
 
     public class ForLoopFibonacci extends FibonacciAlgorithm {
         @Override
         void fibonacci(int length) {
             int a = 0, b = 1;
+            iterations = 0;
             for (int i = 1; i <= length; ++i) {
+                iterations++;
                 int c = a + b;
                 a = b;
                 b = c;
@@ -40,9 +47,11 @@ public class FibonacciApiController {
     public class WhileLoopFibonacci extends FibonacciAlgorithm {
         @Override
         void fibonacci(int length) {
+            iterations = 0;
             int a = 0, b = 1;
             int i = 1;
             while (i <= length) {
+                iterations++;
                 int c = a + b;
                 a = b;
                 b = c;
@@ -54,6 +63,7 @@ public class FibonacciApiController {
     public class RecursionFibonacci extends FibonacciAlgorithm {
         @Override
         void fibonacci(int length) {
+            iterations = 0;
             finishRecursion(length);
         }
 
@@ -65,8 +75,8 @@ public class FibonacciApiController {
             f[1] = 1;
  
             for (i = 2; i <= n; i++) {
-            
-            f[i] = f[i - 1] + f[i - 2];
+                iterations++;
+                f[i] = f[i - 1] + f[i - 2];
         }
  
         return f[n];
@@ -76,6 +86,7 @@ public class FibonacciApiController {
     public class MatrixFibonacci extends FibonacciAlgorithm {
         @Override
         void fibonacci(int length) {
+            iterations = 0;
             matrixRecursive(length);
         }
 
@@ -85,6 +96,7 @@ public class FibonacciApiController {
             }
             long a = 0, b = 1, temp;
             for (int i = 2; i <= n; i++) {
+                iterations++;
                 temp = a + b;
                 a = b;
                 b = temp;
@@ -93,12 +105,38 @@ public class FibonacciApiController {
         }
     }
 
+        @GetMapping("/speeds")
+        public Map<String, Map<String, Integer>> getAlgorithmSpeeds(@RequestParam(required = false) Integer length) {
+            int size = (length != null && length > 0) ? length : 35;
+
+            Map<String, Map<String, Integer>> algorithmSpeeds = new HashMap<>();
+
+            algorithmSpeeds.put("forLoopFibonacci", getAlgorithmInfo(new ForLoopFibonacci(), size));
+            algorithmSpeeds.put("whileLoopFibonacci", getAlgorithmInfo(new WhileLoopFibonacci(), size));
+            algorithmSpeeds.put("recursionFibonacci", getAlgorithmInfo(new RecursionFibonacci(), size));
+            algorithmSpeeds.put("matrixFibonacci", getAlgorithmInfo(new MatrixFibonacci(), size));
+
+            return algorithmSpeeds;
+    }
+
+    private Map<String, Integer> getAlgorithmInfo(FibonacciAlgorithm algorithm, int size) {
+        Map<String, Integer> algorithmInfo = new HashMap<>();
+
+        algorithmInfo.put("time", algorithm.measureFibonacciTime(size)); 
+        algorithmInfo.put("iterations", algorithm.getIterations());
+
+        return algorithmInfo;
+    }
+
     @GetMapping("/bet")
     public Map<String, Object> betOnFibonacciRace(@RequestParam(required = true) int betAmount,
                                                   @RequestParam(required = true) int startingPoints) {
         Betting game = new Betting(startingPoints);
     
-        Map<String, Integer> speeds = getAlgorithmSpeeds(null);
+        Map<String, Map<String, Integer>> info = getAlgorithmSpeeds(null);
+
+        Map<String, Integer> speeds = new HashMap<>();
+        info.forEach((algorithm, analytics) -> speeds.put(algorithm, analytics.get("time")));
     
         // Randomly select a Fibonacci algorithm
         List<String> algorithms = new ArrayList<>(speeds.keySet());
@@ -132,22 +170,5 @@ public class FibonacciApiController {
         facts.put("recursionFibonacci", "Recursion Fibonacci is elegant but can be less efficient due to its exponential time complexity, especially for large sequences.");
         facts.put("matrixFibonacci", "Matrix Fibonacci uses matrix multiplication to calculate Fibonacci numbers, providing a more efficient approach for larger sequences.");
         return facts;
-    }
-    
-
-    
-
-    @GetMapping("/speeds")
-    public Map<String, Integer> getAlgorithmSpeeds(@RequestParam(required = false) Integer length) {
-        int size = (length != null && length > 0) ? length : 35;
-
-        Map<String, Integer> algorithmSpeeds = new HashMap<>();
-
-        algorithmSpeeds.put("forLoopFibonacci", new ForLoopFibonacci().measureFibonacciTime(size));
-        algorithmSpeeds.put("whileLoopFibonacci", new WhileLoopFibonacci().measureFibonacciTime(size));
-        algorithmSpeeds.put("recursionFibonacci", new RecursionFibonacci().measureFibonacciTime(size));
-        algorithmSpeeds.put("matrixFibonacci", new MatrixFibonacci().measureFibonacciTime(size));
-
-        return algorithmSpeeds;
     }
 }
