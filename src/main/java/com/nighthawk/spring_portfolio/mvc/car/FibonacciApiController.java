@@ -16,8 +16,8 @@ import java.util.Random;
 public class FibonacciApiController {
 
     abstract public class FibonacciAlgorithm {
-        protected int comparisons;
         protected int iterations;
+        protected String complexity;
         abstract void fibonacci(int length);
         public int measureFibonacciTime(int size) {
             long startTime = System.nanoTime();
@@ -28,6 +28,9 @@ public class FibonacciApiController {
         public int getIterations() {
             return iterations;
         }
+        public String getComplexity() {
+            return complexity;
+        }
     }
 
     public class ForLoopFibonacci extends FibonacciAlgorithm {
@@ -35,6 +38,7 @@ public class FibonacciApiController {
         void fibonacci(int length) {
             int a = 0, b = 1;
             iterations = 0;
+            complexity = "O(n)";
             for (int i = 1; i <= length; ++i) {
                 iterations++;
                 int c = a + b;
@@ -47,6 +51,7 @@ public class FibonacciApiController {
     public class WhileLoopFibonacci extends FibonacciAlgorithm {
         @Override
         void fibonacci(int length) {
+            complexity = "O(n)";
             iterations = 0;
             int a = 0, b = 1;
             int i = 1;
@@ -63,6 +68,7 @@ public class FibonacciApiController {
     public class RecursionFibonacci extends FibonacciAlgorithm {
         @Override
         void fibonacci(int length) {
+            complexity = "O(n^2)";
             iterations = 0;
             finishRecursion(length);
         }
@@ -86,6 +92,7 @@ public class FibonacciApiController {
     public class MatrixFibonacci extends FibonacciAlgorithm {
         @Override
         void fibonacci(int length) {
+            complexity = "O(log(n))";
             iterations = 0;
             matrixRecursive(length);
         }
@@ -124,7 +131,6 @@ public class FibonacciApiController {
 
         algorithmInfo.put("time", algorithm.measureFibonacciTime(size)); 
         algorithmInfo.put("iterations", algorithm.getIterations());
-
         return algorithmInfo;
     }
 
