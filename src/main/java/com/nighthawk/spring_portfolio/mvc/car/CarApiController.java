@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nighthawk.spring_portfolio.mvc.betting.Betting;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,12 +162,12 @@ public class CarApiController {
     }
 
     @GetMapping("/speeds")
-    public Map<String, Object> getAlgorithmSpeeds(@RequestParam(required = false) Integer arraySize) {
+    public Map<String, Map<String, Integer>> getAlgorithmSpeeds(@RequestParam(required = false) Integer arraySize) {
         int size = (arraySize != null && arraySize > 0) ? arraySize : 40000;
 
         int[] randomArray = generateRandomArray(size);
 
-        Map<String, Object> algorithmSpeeds = new HashMap<>();
+        Map<String, Map<String, Integer>> algorithmSpeeds = new HashMap<>();
 
         algorithmSpeeds.put("mergeSort", getAlgorithmInfo(new MergeSort(), randomArray.clone()));
         algorithmSpeeds.put("insertionSort", getAlgorithmInfo(new InsertionSort(), randomArray.clone()));
@@ -185,8 +184,8 @@ public class CarApiController {
         }
         return randomArray;
     }
-    private Map<String, Object> getAlgorithmInfo(SortingAlgorithm algorithm, int[] arr) {
-        Map<String, Object> algorithmInfo = new HashMap<>();
+    private Map<String, Integer> getAlgorithmInfo(SortingAlgorithm algorithm, int[] arr) {
+        Map<String, Integer> algorithmInfo = new HashMap<>();
 
         int time = algorithm.measureSortingSpeed(arr);
         int iterations = algorithm.getIterations();
@@ -202,7 +201,10 @@ public Map<String, Object> betOnSortRace(@RequestParam(required = true) int betA
                                          @RequestParam(required = true) int startingPoints) {
     Betting game = new Betting(startingPoints);
 
-    Map<String, Object> speeds = getAlgorithmSpeeds(null);
+    Map<String, Map<String, Integer>> info = getAlgorithmSpeeds(null);
+
+    Map<String, Integer> speeds = new HashMap<>();
+    info.forEach((algorithm, analytics) -> speeds.put(algorithm, analytics.get("time")));
 
     // randomly select an algorithm
     List<String> algorithms = new ArrayList<>(speeds.keySet());
