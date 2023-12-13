@@ -23,7 +23,7 @@ public class FibonacciApiController {
             long startTime = System.nanoTime();
             fibonacci(size);
             long endTime = System.nanoTime();
-            return (int) ((endTime - startTime)) / 1000;
+            return (int) (endTime - startTime) * 10;
         }
         public int getIterations() {
             return iterations;
