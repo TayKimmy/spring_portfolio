@@ -22,13 +22,24 @@ public class CarApiController {
 
     // sorting algorithms superclass
     abstract class SortingAlgorithm {
+        private int iterations; // iteration count
+
         abstract void sort(int[] arr);
 
         int measureSortingSpeed(int[] arr) {
             long startTime = System.currentTimeMillis();
+            iterations = 0; // set iteration count to 0
             sort(arr);
             long endTime = System.currentTimeMillis();
             return (int) (endTime - startTime);
+        }
+
+        int getIterations() {
+            return iterations;
+        }
+
+        void incrementIterations() {
+            iterations++; // add to iteration count
         }
     }
 
@@ -36,10 +47,65 @@ public class CarApiController {
     class MergeSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
-            Arrays.sort(arr);
+            mergeSort(arr, 0, arr.length - 1);
+        }
+    
+        private void mergeSort(int[] arr, int low, int high) {
+            if (low < high) {
+                int mid = low + (high - low) / 2;
+    
+                mergeSort(arr, low, mid);
+                mergeSort(arr, mid + 1, high);
+    
+                merge(arr, low, mid, high);
+            }
+        }
+    
+        private void merge(int[] arr, int low, int mid, int high) {
+            int n1 = mid - low + 1;
+            int n2 = high - mid;
+    
+            int[] left = new int[n1];
+            int[] right = new int[n2];
+    
+            for (int i = 0; i < n1; ++i) {
+                left[i] = arr[low + i];
+            }
+    
+            for (int j = 0; j < n2; ++j) {
+                right[j] = arr[mid + 1 + j];
+            }
+    
+            int i = 0, j = 0;
+            int k = low;
+    
+            while (i < n1 && j < n2) {
+                if (left[i] <= right[j]) {
+                    arr[k] = left[i];
+                    i++;
+                } else {
+                    arr[k] = right[j];
+                    j++;
+                }
+                k++;
+                incrementIterations(); 
+            }
+    
+            while (i < n1) {
+                arr[k] = left[i];
+                i++;
+                k++;
+                incrementIterations(); 
+            }
+    
+            while (j < n2) {
+                arr[k] = right[j];
+                j++;
+                k++;
+                incrementIterations();
+            }
         }
     }
-
     // insertion sort
     class InsertionSort extends SortingAlgorithm {
         @Override
@@ -52,18 +118,20 @@ public class CarApiController {
                 while (j >= 0 && arr[j] > key) {
                     arr[j + 1] = arr[j];
                     j = j - 1;
+                    incrementIterations(); // Move it here
                 }
                 arr[j + 1] = key;
             }
         }
     }
-
     // bubble sort
     class BubbleSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
             int n = arr.length;
             for (int i = 0; i < n - 1; i++) {
+                incrementIterations(); 
+
                 for (int j = 0; j < n - i - 1; j++) {
                     if (arr[j] > arr[j + 1]) {
                         int temp = arr[j];
@@ -74,7 +142,6 @@ public class CarApiController {
             }
         }
     }
-
     // selection sort
     class SelectionSort extends SortingAlgorithm {
         @Override
@@ -85,6 +152,7 @@ public class CarApiController {
                 for (int j = i + 1; j < n; j++) {
                     if (arr[j] < arr[minIdx]) {
                         minIdx = j;
+                        incrementIterations();
                     }
                 }
                 int temp = arr[minIdx];
@@ -95,21 +163,20 @@ public class CarApiController {
     }
 
     @GetMapping("/speeds")
-    public Map<String, Integer> getAlgorithmSpeeds(@RequestParam(required = false) Integer arraySize) {
+    public Map<String, Object> getAlgorithmSpeeds(@RequestParam(required = false) Integer arraySize) {
         int size = (arraySize != null && arraySize > 0) ? arraySize : 40000;
 
         int[] randomArray = generateRandomArray(size);
 
-        Map<String, Integer> algorithmSpeeds = new HashMap<>();
+        Map<String, Object> algorithmSpeeds = new HashMap<>();
 
-        algorithmSpeeds.put("mergeSort", new MergeSort().measureSortingSpeed(randomArray.clone()));
-        algorithmSpeeds.put("insertionSort", new InsertionSort().measureSortingSpeed(randomArray.clone()));
-        algorithmSpeeds.put("bubbleSort", new BubbleSort().measureSortingSpeed(randomArray.clone()));
-        algorithmSpeeds.put("selectionSort", new SelectionSort().measureSortingSpeed(randomArray.clone()));
+        algorithmSpeeds.put("mergeSort", getAlgorithmInfo(new MergeSort(), randomArray.clone()));
+        algorithmSpeeds.put("insertionSort", getAlgorithmInfo(new InsertionSort(), randomArray.clone()));
+        algorithmSpeeds.put("bubbleSort", getAlgorithmInfo(new BubbleSort(), randomArray.clone()));
+        algorithmSpeeds.put("selectionSort", getAlgorithmInfo(new SelectionSort(), randomArray.clone()));
 
         return algorithmSpeeds;
     }
-
     private int[] generateRandomArray(int size) {
         int[] randomArray = new int[size];
         Random random = new Random();
@@ -118,14 +185,24 @@ public class CarApiController {
         }
         return randomArray;
     }
+    private Map<String, Object> getAlgorithmInfo(SortingAlgorithm algorithm, int[] arr) {
+        Map<String, Object> algorithmInfo = new HashMap<>();
 
+        int time = algorithm.measureSortingSpeed(arr);
+        int iterations = algorithm.getIterations();
+
+        algorithmInfo.put("time", time);
+        algorithmInfo.put("iterations", iterations);
+
+        return algorithmInfo;
+    }
 @GetMapping("/bet")
 
 public Map<String, Object> betOnSortRace(@RequestParam(required = true) int betAmount,
                                          @RequestParam(required = true) int startingPoints) {
     Betting game = new Betting(startingPoints);
 
-    Map<String, Integer> speeds = getAlgorithmSpeeds(null);
+    Map<String, Object> speeds = getAlgorithmSpeeds(null);
 
     // randomly select an algorithm
     List<String> algorithms = new ArrayList<>(speeds.keySet());
