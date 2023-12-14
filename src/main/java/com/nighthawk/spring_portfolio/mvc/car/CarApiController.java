@@ -42,7 +42,7 @@ public class CarApiController {
         }
     }
 
-    // merge sort
+    // merge sort, divides the array into two halves, sorts each half, and then merges them
     class MergeSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
@@ -105,7 +105,7 @@ public class CarApiController {
             }
         }
     }
-    // insertion sort
+    // insertion sort, builds the sorted array one item at a time by comparing each element with the rest and placing it in the correct position
     class InsertionSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
@@ -123,7 +123,7 @@ public class CarApiController {
             }
         }
     }
-    // bubble sort
+    // bubble sort, repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order
     class BubbleSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
@@ -141,7 +141,7 @@ public class CarApiController {
             }
         }
     }
-    // selection sort
+    // selection sort, sorts an array by repeatedly finding the minimum element from the unsorted part and putting it at the beginning
     class SelectionSort extends SortingAlgorithm {
         @Override
         void sort(int[] arr) {
